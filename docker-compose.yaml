@@ -1,0 +1,94 @@
+services:
+  # =============================
+  # FASTAPI SERVICE
+  # =============================
+  fastapi:
+    build: .
+    container_name: maven-fastapi
+    working_dir: /workspace
+    command: uvicorn assignments.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/workspace
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    depends_on:
+      chromadb:
+        condition: service_healthy
+    networks:
+      - maven-ai-network
+    restart: unless-stopped
+
+  # =============================
+  # STREAMLIT SERVICE
+  # =============================
+  streamlit:
+    build: .
+    container_name: maven-streamlit
+    working_dir: /workspace
+    command: streamlit run assignments/streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+    volumes:
+      - .:/workspace
+    ports:
+      - "8501:8501"
+    networks:
+      - maven-ai-network
+    restart: unless-stopped
+
+  # =============================
+  # JUPYTER LAB SERVICE
+  # =============================
+  jupyter:
+    build: .
+    container_name: maven-jupyter
+    working_dir: /workspace
+    command: jupyter lab --ip=0.0.0.0 --allow-root --no-browser
+    volumes:
+      - .:/workspace
+      - jupyter_data:/root/.jupyter
+    ports:
+      - "8888:8888"
+    networks:
+      - maven-ai-network
+    restart: unless-stopped
+
+  # =============================
+  # CHROMADB SERVICE
+  # =============================
+  chromadb:
+    image: chromadb/chroma:0.5.23
+    container_name: maven-chromadb
+    volumes:
+      - chroma_data:/chroma/chroma
+    ports:
+      - "8001:8000"
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+      - ALLOW_RESET=TRUE
+    networks:
+      - maven-ai-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# =============================
+# NETWORK
+# =============================
+networks:
+  maven-ai-network:
+    driver: bridge
+
+# =============================
+# VOLUMES
+# =============================
+volumes:
+  jupyter_data:
+  chroma_data:
