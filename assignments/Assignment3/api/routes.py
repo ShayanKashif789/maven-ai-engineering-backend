@@ -4,8 +4,8 @@ import os
 # Notice: We don't need 'from google import genai' here because 
 # RAGManager handles the LLM via LangChain internally!
 from assignments.Assignment3.core.rag_manager import RAGManager
-from assignments.Assignment3.core.config import settings
-from assignments.Assignment3.api.schemas import ChatRequest, ChatResponse, UploadResponse
+from assignments.config import settings
+from assignments.schemas import ChatRequest, ChatResponse, UploadResponse
 
 router = APIRouter()
 
@@ -38,4 +38,5 @@ async def chat(request: ChatRequest):
         return result
         
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")

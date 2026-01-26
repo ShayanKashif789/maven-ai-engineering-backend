@@ -13,9 +13,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 
-from assignments.Assignment3.core.config import settings
-
-
+from assignments.config import settings
+# from langchain_core.output_parsers import StrOutputParser
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -161,6 +160,7 @@ Question: {question}""")
             }
             | prompt
             | llm
+            # | StrOutputParser()
         )
 
     
