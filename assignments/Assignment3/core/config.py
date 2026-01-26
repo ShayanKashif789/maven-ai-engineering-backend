@@ -5,8 +5,7 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: str
     CHROMA_HOST: str = "chromadb"
     CHROMA_PORT: int = 8000
-    UPLOAD_DIR: str = "/workspace/temp_uploads",
-    SERP_API_KEY:str
+    UPLOAD_DIR: str = "/workspace/temp_uploads"
     
     class Config:
         env_file = ".env"
