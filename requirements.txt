@@ -41,6 +41,7 @@ langchain-community==0.3.12
 langchain-openai==0.2.14
 llama-index==0.12.11
 langchain-google-genai==2.0.8
+langchain-groq==0.2.0
 # Replaced deprecated google-generativeai with google-genai
 google-genai
 # Explicitly required for text splitting import

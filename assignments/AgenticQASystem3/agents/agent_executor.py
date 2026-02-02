@@ -6,20 +6,16 @@ from assignments.AgenticQASystem3.tools.vector_search import vector_search
 from assignments.AgenticQASystem3.tools.calculator import calculator
 from assignments.AgenticQASystem3.tools.Web_search import web_search
 from assignments.config import settings
-from langchain_google_genai import ChatGoogleGenerativeAI
-llm = ChatGoogleGenerativeAI(
-    model='gemini-2.5-flash',
-    api_key=settings.GOOGLE_API_KEY,
-    )
-
+from assignments.AgenticQASystem3.core.llm_factory import get_llm
+from langchain.prompts import MessagesPlaceholder
+llm=get_llm()
 prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", SYSTEM_PROMPT),  
+        ("system", SYSTEM_PROMPT),
         ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}")  
+        ("assistant", "{agent_scratchpad}"),
     ]
 )
-
 
 tools = [vector_search, calculator, web_search]
 
@@ -32,6 +28,8 @@ agent = create_react_agent(
 agent_executor = AgentExecutor(
     agent=agent,
     tools=tools,
-    verbose=True,  
-    handle_parsing_errors=True  
+    max_iterations=5,
+    max_execution_time=20,
+    verbose=settings.DEBUG,
+    handle_parsing_errors=True
 )

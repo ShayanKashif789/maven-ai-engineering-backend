@@ -25,14 +25,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     wget \
     ca-certificates \
+    libglib2.0-0 \
+    libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
 # ================================
 # Python Dependencies
 # ================================
 COPY requirements.txt .
-RUN pip install --upgrade pip && \
-    pip install --default-timeout=3000 --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --prefer-binary --no-cache-dir --default-timeout=3000 -r requirements.txt
 
 # ================================
 # NLTK Data

@@ -1,6 +1,6 @@
 import os
 from google import genai
-from assignments.Assignment3.core.config import settings
+from assignments.config import settings
 
 # Attempt to configure and list models
 try:

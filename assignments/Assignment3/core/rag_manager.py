@@ -3,7 +3,7 @@ import uuid
 import logging
 import chromadb
 from typing import List, Dict, Any
-
+from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from llama_index.core import SimpleDirectoryReader
 
@@ -129,9 +129,9 @@ class RAGManager:
             search_kwargs={"k": self.default_k}
         )
 
-        llm = ChatGoogleGenerativeAI(
-            model='gemini-2.5-flash',
-            api_key=settings.GOOGLE_API_KEY,
+        llm = ChatGroq(
+        model=settings.LLM_MODEL,
+        api_key=settings.GOOGLE_API_KEY,
         )
         prompt = ChatPromptTemplate.from_template("""Answer the question using ONLY the provided context.
 If context is insufficient respond exactly:
