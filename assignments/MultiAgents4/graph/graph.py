@@ -11,6 +11,7 @@ from assignments.MultiAgents4.agents.writing_supervisor import writing_superviso
 from assignments.MultiAgents4.agents.note_taker import note_taker_node
 from assignments.MultiAgents4.agents.draft_writer import draft_writer_node
 from assignments.MultiAgents4.agents.draft_editor import draft_editor_node
+from assignments.MultiAgents4.agents.finalizer import finalizer_node
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ def build_initial_state(user_query: str) -> AgentState:
         "vector_results": None,
         "web_results": None,
         "research_summary": None,
+        "research_failed": None,
         "writing_plan": None,
         "target_format": None,
         "tone": None,
@@ -61,11 +63,15 @@ def _should_run_research_execution(state: AgentState) -> bool:
     if not state.get("research_required"):
         return False
     sources = state.get("research_sources") or []
-    if not sources and state.get("research_source") not in ("vector", "web"):
+    if not sources and state.get("research_source") in ("vector", "web"):
+        sources = [state["research_source"]]
+    if not sources:
         return False
-    if _has_value(state.get("vector_results")) or _has_value(state.get("web_results")):
-        return False
-    return True
+    has_vector = _has_value(state.get("vector_results"))
+    has_web = _has_value(state.get("web_results"))
+    if ("vector" in sources and not has_vector) or ("web" in sources and not has_web):
+        return True
+    return False
 
 
 def _validate_state(state: AgentState) -> bool:
@@ -100,6 +106,7 @@ def run_graph(state: AgentState, config: Optional[GraphConfig] = None) -> AgentS
     cfg = config or GraphConfig()
     if not _validate_state(state):
         logger.warning("Graph aborted: missing or empty user_query")
+        state["final_output"] = "Please provide a query so I can help."
         return state
 
     nodes: List[NodeSpec] = [
@@ -110,6 +117,7 @@ def run_graph(state: AgentState, config: Optional[GraphConfig] = None) -> AgentS
         NodeSpec(name="note_taker", fn=note_taker_node),
         NodeSpec(name="draft_writer", fn=draft_writer_node),
         NodeSpec(name="draft_editor", fn=draft_editor_node),
+        NodeSpec(name="finalizer", fn=finalizer_node),
     ]
 
     steps = 0

@@ -16,6 +16,7 @@ class AgentState(TypedDict):
     vector_results: Optional[str]
     web_results: Optional[str]
     research_summary: Optional[str]
+    research_failed: Optional[bool]
 
     # Writing supervisor outputs
     writing_plan: Optional[Dict[str, Any]]
