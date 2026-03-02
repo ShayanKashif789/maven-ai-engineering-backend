@@ -24,6 +24,10 @@ _TONE_KEYWORDS = {
     "educational": "EDUCATIONAL",
     "teach": "EDUCATIONAL",
     "explainer": "EDUCATIONAL",
+    "threatening": "THREATENING",
+    "threat": "THREATENING",
+    "warning": "THREATENING",
+    "urgent": "THREATENING",
 }
 
 _POST_TYPE_KEYWORDS = {
@@ -47,6 +51,7 @@ _VALID_TONES = {
     "OPINIONATED",
     "STORYTELLING",
     "EDUCATIONAL",
+    "THREATENING",
 }
 
 _VALID_POST_TYPES = {
@@ -72,6 +77,7 @@ def _score_signals(text: str) -> Tuple[str, str, float, int, int]:
         "OPINIONATED": 0.0,
         "STORYTELLING": 0.0,
         "EDUCATIONAL": 0.0,
+        "THREATENING": 0.0,
     }
     post_scores = {
         "TECHNICAL_EXPLAINER": 0.0,
@@ -99,6 +105,11 @@ def _score_signals(text: str) -> Tuple[str, str, float, int, int]:
     # Normalize into 0..1 range with diminishing returns
     confidence = min(combined / 1.4, 1.0)
 
+    # Special handling: If tone signal is strong but post signal is weak, 
+    # give more weight to tone signal for tone-dependent queries
+    if tone_strength >= 0.6 and post_strength < 0.6:
+        confidence = min(tone_strength, 1.0)
+
     tone_nonzero = sum(1 for v in tone_scores.values() if v > 0)
     post_nonzero = sum(1 for v in post_scores.values() if v > 0)
     if tone_nonzero > 1:
@@ -114,7 +125,7 @@ def _llm_fallback_writer_classifier(user_query: str) -> Tuple[str, str, str]:
         llm = get_llm()
         system_prompt = """You are a writing planner for LinkedIn posts.
 Return a JSON object with keys: tone, post_type, target_format.
-Valid tones: PROFESSIONAL, CONVERSATIONAL, OPINIONATED, STORYTELLING, EDUCATIONAL.
+Valid tones: PROFESSIONAL, CONVERSATIONAL, OPINIONATED, STORYTELLING, EDUCATIONAL, THREATENING.
 Valid post_type: TECHNICAL_EXPLAINER, STORY_DRIVEN, OPINION_HOT_TAKE, ANNOUNCEMENT, EDUCATIONAL_THREAD.
 Valid target_format: single_post, thread.
 Return ONLY JSON, no extra text.
@@ -162,10 +173,25 @@ def writing_supervisor_node(state: AgentState, enable_llm_fallback: bool = True)
         tone, post_type, confidence, tone_nonzero, post_nonzero = _score_signals(source_text)
         target_format = "thread" if post_type == "EDUCATIONAL_THREAD" else "single_post"
 
+        # CONSOLE OUTPUT FOR TESTING
+        print(f"🎯 TONE DETECTION RESULTS:")
+        print(f"   📝 User Query: {user_query[:50]}...")
+        print(f"   🔍 Detected Tone: {tone}")
+        print(f"   📊 Confidence Score: {confidence:.2f}")
+        print(f"   🎯 Post Type: {post_type}")
+        print(f"   📋 Target Format: {target_format}")
+        print(f"   🔢 Tone Signals Found: {tone_nonzero}")
+        print(f"   🔢 Post Signals Found: {post_nonzero}")
+        print("-" * 50)
+
         # Low-confidence -> LLM fallback
         if enable_llm_fallback and confidence < _CONFIDENCE_THRESHOLD:
             fallback_input = research_summary if research_summary else user_query
             tone, post_type, target_format = _llm_fallback_writer_classifier(fallback_input)
+            print(f"🤖 LLM FALLBACK USED:")
+            print(f"   📝 Tone: {tone}")
+            print(f"   🎯 Post Type: {post_type}")
+            print(f"   📋 Format: {target_format}")
         elif confidence >= _STRONG_SIGNAL_THRESHOLD:
             logger.debug(
                 "Writing supervisor high confidence: %.2f (tone signals=%d, post signals=%d)",
@@ -180,6 +206,9 @@ def writing_supervisor_node(state: AgentState, enable_llm_fallback: bool = True)
             post_type = "TECHNICAL_EXPLAINER"
         if target_format not in _VALID_TARGET_FORMATS:
             target_format = "single_post"
+
+        print(f"✅ FINAL TONE SELECTION: {tone}")
+        print("=" * 50)
 
         state["tone"] = tone
         state["target_format"] = target_format

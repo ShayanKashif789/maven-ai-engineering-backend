@@ -177,10 +177,23 @@ def meta_supervisor_node(
 ) -> AgentState:
     try:
         user_query: Optional[str] = state.get("user_query", "")
+        
+        # CONSOLE OUTPUT FOR TESTING
+        print(f"🚀 META SUPERVISOR ANALYSIS:")
+        print(f"   📝 User Query: {user_query[:100]}...")
+        print("-" * 50)
+        
         decision = build_meta_supervisor_state(
             user_query or "",
             use_llm_fallback=enable_llm_fallback,
         )
+        
+        print(f"🎯 INTENT DETECTION RESULTS:")
+        print(f"   🎯 Intent: {decision.intent}")
+        print(f"   👥 Target Team: {decision.target_team}")
+        print(f"   ✅ Classification: {'Rule-based' if decision.intent != 'unknown' or not enable_llm_fallback else 'LLM Fallback'}")
+        print("=" * 50)
+        
         state["intent"] = decision.intent
         state["target_team"] = decision.target_team
         

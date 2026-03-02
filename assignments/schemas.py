@@ -14,9 +14,9 @@ class UploadResponse(BaseModel):
 
 class MultiAgentRequest(BaseModel):
     query: str
+    async_execution: Optional[bool] = False
     max_retries: Optional[int] = None
     max_steps: Optional[int] = None
-    async_execution: bool = True
 
 class MultiAgentResponse(BaseModel):
     success: bool
@@ -30,5 +30,3 @@ class MultiAgentResponse(BaseModel):
     research_summary: Optional[str] = None
     draft: Optional[str] = None
     edited_draft: Optional[str] = None
-    vector_results: Optional[str] = None
-    web_results: Optional[str] = None
