@@ -12,12 +12,18 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - LLAMA_API_KEY=${LLAMA_API_KEY}
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
     depends_on:
       chromadb:
         condition: service_healthy
+      qdrant:
+        condition: service_started
     networks:
       - maven-ai-network
     restart: unless-stopped
@@ -79,6 +85,21 @@ services:
       retries: 3
       start_period: 10s
 
+  # =============================
+  # QDRANT SERVICE
+  # =============================
+  qdrant:
+    image: qdrant/qdrant:v1.13.4
+    container_name: maven-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - maven-ai-network
+    restart: unless-stopped
+
 # =============================
 # NETWORK
 # =============================
@@ -92,3 +113,4 @@ networks:
 volumes:
   jupyter_data:
   chroma_data:
+  qdrant_data:
