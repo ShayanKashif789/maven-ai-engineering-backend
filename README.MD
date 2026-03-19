@@ -1,240 +1,126 @@
-Maven AI Engineering Backend
+# Maven AI Engineering Backend
 
 A collection of production-grade AI systems demonstrating scalable, secure, and efficient architectures for LLM-based applications.
 
-This repository contains multiple independent projects exploring modern AI engineering patterns such as RAG pipelines, multi-agent systems, DAG-based workflows, hybrid routing, and security-focused AI design.
+This repository serves as a modular AI engineering workspace. Each project is designed to solve specific real-world problems while experimenting with distinct architectural patterns to optimize performance, cost, and reliability.
 
-Overview
+---
 
-This repository serves as a modular AI engineering workspace, where each project is designed to:
+## 🚀 Core Features
 
-Solve a specific real-world problem
+* **Retrieval-Augmented Generation (RAG):** Advanced document chunking and vector database integration.
+* **DAG-based Execution Pipelines:** Structured, non-linear task orchestration for complex logic.
+* **Multi-Agent Architectures:** Specialized agents collaborating to solve multifaceted tasks.
+* **Hybrid Routing:** Rule-based logic combined with LLM fallback for optimal cost-efficiency.
+* **LLM-as-a-Judge Evaluation:** Automated systems for tracking metrics like Correctness and Faithfulness.
+* **Prompt Injection Defense:** Multi-layered security (Regex + Sandwich Pattern) to prevent malicious overrides.
+* **AST-based Safe Tool Execution:** Secure evaluation of Python expressions to prevent arbitrary code execution.
+* **Parallel & Async Execution:** Optimized for high-concurrency and low-latency workloads.
 
-Experiment with a distinct architectural pattern
+---
 
-Optimize performance, cost, and reliability
+## 🏗 System Architecture
 
-Each project is:
+The system is designed using a service-oriented architecture to ensure modularity and scalability:
 
-Fully isolated in its own directory
+**User Request** ↓  
+**Hybrid Router** (Keyword-based O(1) classification + LLM fallback)  
+↓  
+**Core Logic** (Agentic QA / RAG Pipeline / DAG Workflow)  
+↓  
+**Tool Execution Layer** (Safe AST-based Sandbox)  
+↓  
+**Evaluation Layer** (LLM-as-a-Judge for Response Verification)  
+↓  
+**Final Response**
 
-Independently runnable
+---
 
-Built with the most suitable tools for its use case
+## 🛠 Tech Stack
 
-Core Features
+| Category | Tools & Frameworks |
+| :--- | :--- |
+| **AI Frameworks** | LangChain, LangGraph, LlamaIndex, OpenAI, Groq, Google GenAI |
+| **NLP & ML** | HuggingFace Transformers, Sentence Transformers, PyTorch, Scikit-learn |
+| **Vector Databases** | ChromaDB, Qdrant, FAISS |
+| **Backend & API** | FastAPI, Flask, Uvicorn, Redis |
+| **Data Handling** | Pandas, NumPy |
+| **Infrastructure** | Docker, Docker Compose, PostgreSQL, MongoDB |
+| **UI & Viz** | Streamlit, Gradio, Plotly |
 
-Retrieval-Augmented Generation (RAG)
+---
 
-DAG-based Execution Pipelines
+## 📂 Repository Structure
 
-Multi-Agent Architectures
+The projects are fully isolated within the `assignments/` directory, allowing them to be run independently.
 
-Hybrid Routing (Rule-based + LLM fallback)
-
-LLM-as-a-Judge Evaluation Systems
-
-Prompt Injection Defense
-
-AST-based Safe Tool Execution
-
-Parallel and Async Execution
-
-System Architecture
-
-The system is designed using a service-oriented architecture:
-
-User Request
-     ↓
-Hybrid Router (Rule-based + LLM fallback)
-     ↓
-Agent / RAG / DAG System
-     ↓
-Tool Execution Layer (Safe AST Execution)
-     ↓
-Evaluation Layer (LLM-as-Judge)
-     ↓
-Response
-Tech Stack
-AI & LLM Frameworks
-
-LangChain, LangGraph
-
-LlamaIndex
-
-OpenAI, Groq, Google GenAI
-
-NLP & Transformers
-
-HuggingFace Transformers
-
-Sentence Transformers
-
-Vector Databases
-
-ChromaDB
-
-Qdrant
-
-FAISS
-
-Backend & APIs
-
-FastAPI
-
-Flask
-
-Uvicorn
-
-Data & ML
-
-PyTorch, TensorFlow
-
-Scikit-learn
-
-Pandas, NumPy
-
-Infrastructure
-
-Docker, Docker Compose
-
-Redis
-
-PostgreSQL / MongoDB
-
-Visualization & UI
-
-Streamlit
-
-Gradio
-
-Plotly
-
-Repository Structure
+```text
 /assignments/
-├── AgenticQASystem/
-├── MultiAgents/
-├── RAG/
-├── Evaluation/
-├── Tools/
+├── AgenticQASystem/   # Intelligent QA with agentic reasoning
+├── MultiAgents/       # Collaborative multi-agent workflows
+├── RAG/               # Advanced Retrieval-Augmented Generation
+├── Evaluation/        # LLM-as-a-Judge and metric tracking systems
+└── Tools/             # Safe tool execution and utility modules
 
-Each folder contains a standalone implementation.
+Key Innovations & Performance
+1. Hybrid Routing System
+Optimization: Uses keyword-based classification for common queries to bypass LLM calls.
 
-Key Innovations
-Hybrid Routing System
+Impact: Reduces LLM API costs by 70–80%.
 
-O(1) keyword-based classification
+Speed: Improves system latency from ~500ms to ~50ms for routed queries.
 
-LLM fallback for ambiguity
+2. Security-First Design
+Prompt Injection Defense: Utilizes delimiter-based isolation (Sandwich Pattern) and regex-based detection to sanitize inputs.
 
-Reduces LLM calls by 70–80%
+AST Safety: Evaluates expressions via Python's Abstract Syntax Tree, allowing strict operator-level control and preventing arbitrary code execution.
 
-Improves latency from ~500ms → ~50ms
+3. LLM-as-a-Judge Evaluation
+Metrics tracked: Correctness, Faithfulness, Helpfulness, Context Recall, and Precision.
 
-Prompt Injection Defense
+Reliability: Implements automated retries, timeouts, and structured JSON parsing.
 
-Regex-based detection
-
-Delimiter-based prompt isolation (Sandwich Pattern)
-
-Protection against direct & indirect injection
-
-AST-Based Tool Safety
-
-Safe evaluation of expressions using Python AST
-
-Prevents arbitrary code execution
-
-Strict operator-level control
-
-LLM-as-a-Judge Evaluation
-
-Metrics: Correctness, Faithfulness, Helpfulness, Context Recall & Precision
-
-Includes retry, timeout, and structured parsing
-
-Parallel Execution
-
-Async pipelines
-
-Optimized for concurrent workloads
-
-Docker-Based Setup (Recommended)
-Start All Services
+⚙️ Setup & Installation
+Docker Setup (Recommended)
+This command starts the FastAPI backend, Streamlit UI, Jupyter Lab, and all vector databases.
 docker-compose up --build
+Service Access:
 
-Services included:
+FastAPI Backend: http://localhost:8000
 
-FastAPI → Backend API (localhost:8000)
+Streamlit UI: http://localhost:8501
 
-Streamlit → UI (localhost:8501)
+Jupyter Lab: http://localhost:8888
 
-Jupyter Lab → Development (localhost:8888)
+Vector DBs: ChromaDB (8001), Qdrant (6333)
 
-ChromaDB → Vector DB
+Local Setup
+Install Requirements:
 
-Qdrant → Vector DB
+Bash
 
-Ports:
+pip install -r requirements.txt
+Environment Variables: Create a .env file:
 
-Service	Port
-FastAPI	8000
-Streamlit	8501
-Jupyter	8888
-ChromaDB	8001
-Qdrant	6333
-
-Environment Variables:
-
-Create a .env file:
+Code snippet
 
 GROQ_API_KEY=your_key
 GOOGLE_API_KEY=your_key
 LLAMA_API_KEY=your_key
-Local Setup (Without Docker)
-pip install -r requirements.txt
+Run Services:
 
-Run FastAPI:
+Bash
 
+# Run Backend
 uvicorn assignments.main:app --reload
 
-Run Streamlit:
-
+# Run UI
 streamlit run assignments/streamlit_app.py
-Example Use Cases
-
-AI-powered content generation systems
-
-Research pipelines using RAG
-
-Multi-agent orchestration systems
-
-Secure tool execution environments
-
-Evaluation pipelines for LLM outputs
-
-Security Design
-
-Prompt injection detection
-
-Input sanitization
-
-Safe tool execution via AST
-
-Controlled LLM interaction
-
-Performance Highlights
-
-70–80% reduction in LLM calls
-
-Low latency (~50ms for common queries)
-
-Efficient concurrent execution
-
-Author
-
+👨‍💻 Author
 Shayan Kashif
 
-GitHub: https://github.com/shayankashif123
-
 Focus: AI Systems, LLM Optimization, Backend Architecture
+
+GitHub: shayankashif123
+
+Experience: Full Stack Developer with a focus on AI Engineering and Security.
